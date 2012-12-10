@@ -2,8 +2,29 @@
 #JETTY_TMP=/var/cache/jetty
 #JAVA_OPTIONS="-Xmx256m -Djava.awt.headless=true \
 #              -Djava.io.tmpdir=$JETTY_TMP -Djava.library.path=/usr/lib"
+JAVA_OPTIONS+=("-server" "-Djava.awt.headless=true" "-Djava.util.logging.config.file=/etc/jetty/logging.properties")
+<% if @java_xmx %>
+JAVA_OPTIONS+=("-Xmx<%= @java_xmx %>")
+<% end %>
+<% if @jmx -%>
+JAVA_OPTIONS+=("-Dcom.sun.management.jmxremote")
+<%   if @jmx_port -%>
+JAVA_OPTIONS+=("-Dcom.sun.management.jmxremote.port=<%= @jmx_port %>")
+JAVA_OPTIONS+=("-Djava.rmi.server.hostname=<%= node['hostname'] %>")
+<%     if @jmx_auth -%>
+JAVA_OPTIONS+=("-Dcom.sun.management.jmxremote.authenticate=true")
+<%     else -%>
+JAVA_OPTIONS+=("-Dcom.sun.management.jmxremote.authenticate=false")
+<%     end %>
+<%     if @jmx_ssl %>
+JAVA_OPTIONS+=("-Dcom.sun.management.jmxremote.ssl=true")
+<%     else %>
+JAVA_OPTIONS+=("-Dcom.sun.management.jmxremote.ssl=false")
+<%     end %>
+<%   end %>
+<% end %>
 JETTY_HOME=<%= node.jetty.home %>
 JETTY_USER=<%= node.jetty.user %>
 JETTY_ARGS="OPTIONS=default,jndi,annotations,jsp"
 TMPDIR=<%= node.jetty.cache %>
-CONFIGS=("--pre=/etc/jetty/jetty-logging.xml" "/etc/jetty.xml" "/etc/jetty/jetty-deploy.xml")
+CONFIGS=("/etc/jetty.xml" "/etc/jetty/jetty-deploy.xml")

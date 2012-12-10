@@ -15,3 +15,10 @@ default[:jetty][:hidden_port] = 8983 if jetty.port.to_i < 1024
 
 default[:jetty][:log_dir]   = "/var/log/jetty"
 default[:jetty][:cache]     = "/var/cache/jetty"
+
+default['jetty']['jmx']['enable'] = false
+default['jetty']['jmx']['port'] = nil #insert a port to activate remote JMX
+default['jetty']['jmx']['auth'] = false #auth not implement in this cookbook for the moment
+default['jetty']['jmx']['ssl'] = false
+
+default['jetty']['java']['xmx'] = nil

@@ -91,6 +91,13 @@ end
 template '/etc/default/jetty' do
   source 'jetty.default.erb'
   mode   '644'
+  variables(
+    :java_xmx => node['jetty']['java']['xmx'],
+    :jmx => node['jetty']['jmx']['enable'],
+    :jmx_port => node['jetty']['jmx']['port'],
+    :jmx_auth => node['jetty']['jmx']['auth'],
+    :jmx_ssl => node['jetty']['jmx']['ssl']
+  )
   notifies :restart, resources(:service => 'jetty')
 end
 
