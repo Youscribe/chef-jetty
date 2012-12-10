@@ -1,4 +1,4 @@
-#
+
 # Cookbook Name:: jetty
 # Recipe:: default
 #
@@ -18,6 +18,7 @@
 #
 
 include_recipe 'java'
+include_recipe "logrotate"
 
 user node.jetty.user do
   gid   node.jetty.group
@@ -58,6 +59,7 @@ remote_file node.jetty.download do
   source   node.jetty.link
   checksum node.jetty.checksum
   mode     0644
+  action :create_if_missing
 end
 
 bash 'Unpack Jetty' do
@@ -114,6 +116,23 @@ end
     mode   '644'
     notifies :restart, resources(:service => 'jetty')
   end
+end
+
+template "/etc/jetty/logging.properties" do
+  source "logging.properties.erb"
+  mode "0644"
+  variables(
+    :log_dir => node["jetty"]["log_dir"]
+  )
+  notifies :restart, resources(:service => 'jetty')
+end
+
+logrotate_app "jetty" do
+  cookbook "logrotate"
+  path "#{node["jetty"]["log_dir"]}/jetty.log"
+  frequency "weekly"
+  create "644 root root"
+  rotate 7
 end
 
 service 'jetty' do
